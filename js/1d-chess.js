@@ -25,7 +25,7 @@ function drawBoard(ctx, pieceList, tileSelected, legalMoves) {
 	const indicatorColor = "rgba(0, 0, 0, 0.25)";
 	const pieceScale = 220
 	
-	// board
+	// draw: board
 	ctx.fillStyle = darkTileColor;
 	ctx.fillRect(0, 0, 100, 100);
 	ctx.fillRect(200, 0, 100, 100);
@@ -38,20 +38,20 @@ function drawBoard(ctx, pieceList, tileSelected, legalMoves) {
 	ctx.fillRect(500, 0, 100, 100);
 	ctx.fillRect(700, 0, 100, 100);
 	
-	// highlighted tile
+	// draw: highlighted tile
 	if (tileSelected != -1) {
 		ctx.fillStyle = highlightColor;
 		ctx.fillRect(tileSelected*100, 0, 100, 100);
 	}
 	
-	// pieces
+	// draw: pieces
 	for (let i = 0; i < pieceList.length; i++) {
 		if (pieceList[i] != "Empty") {
 			ctx.drawImage(pieces[pieceList[i]], i*100, 0, 8*pieceScale, pieceScale);
 		}
 	}
 	
-	// possible move indicators
+	// draw: legal move indicators
 	if (legalMoves) {
 		for (let i = 0; i < legalMoves.length; i++) {
 			ctx.strokeStyle = indicatorColor;
@@ -281,15 +281,17 @@ function isEndOfGame(pieceList, turn) {
 function drawEndScreen(gameState) {
 	const backgroundColour = "rgba(0, 0, 0, 0.5)";
 	const textColor = "rgb(255, 255, 255)";
+	const buttonColor = "#5a5b5d";
 	
+	// draw: background
 	ctx.fillStyle = backgroundColour;
 	ctx.fillRect(0, 0, 800, 100);
 	
+	// draw: win text
 	ctx.fillStyle = textColor;
 	ctx.textAlign = "center";
 	ctx.font = "40px Arial";
 	ctx.textBaseline = "middle";
-	
 	let script;
 	switch (gameState["winner"]){
 		case "white":
@@ -303,7 +305,17 @@ function drawEndScreen(gameState) {
 			break;
 	}
 	script += " by " + gameState["reason"] + "!";
-	ctx.fillText(script, 400, 50);
+	ctx.fillText(script, 400, 30);
+	
+	// draw: 'play again' button
+	
+	ctx.fillStyle = buttonColor;
+	roundRect(ctx, 325, 55, 150, 30, 5, true, false);
+	
+	ctx.fillStyle = textColor;
+	ctx.font = "25px sans-sarif";
+	ctx.fillText("Play again?", 400, 70);
+	
 }
 
 // Keeps track of number of times every position has been seen
@@ -336,8 +348,6 @@ function recordPosition(pieceList) {
 		}
 	});
 	
-	console.log(threefoldRep);
-	console.log(positionsSeen);
 	if (Object.keys(positionsSeen).includes(hash)) {
 		positionsSeen[hash] += 1
 		if (positionsSeen[hash] == 3) {
@@ -356,20 +366,32 @@ $(window).ready(function(){
 	ctx = canvas.get(0).getContext("2d");
 	pieces = getImagesfromDom();
 	
-	let turn = "white";
-	let selectedTile = -1;
-	let legalMoves = [];
-	gameState = {"winner" : "none"};
+	let turn, selectedTile, legalMoves, gameState, pieceList;
 	
+	initGame = function() {
+		// init vars
+		turn = "white";
+		selectedTile = -1;
+		legalMoves = [];
+		gameState = {"winner" : "none"};
+		
+		//init board
+		pieceList = ["white-king", "white-knight", "white-rook", "Empty", "Empty", "black-rook", "black-knight", "black-king"];
+		drawBoard(ctx, pieceList, selectedTile);
+	};
 	
-	//init board
-	let pieceList = ["white-king", "white-knight", "white-rook", "Empty", "Empty", "black-rook", "black-knight", "black-king"];
-	drawBoard(ctx, pieceList, selectedTile);
+	initGame();
 
 	// 'mouesdown on board' event handler
 	$("#chess-canvas").mousedown(function(e) {
 		if (gameState["winner"] != "none"){
-			//TODO: click to replay?
+			posClicked = getCursorPosition(e);
+			if (325 <= posClicked[0] && posClicked[0] <= 475 &&
+			    55 <= posClicked[1] && posClicked[1] <= 85) {
+					
+				//reset game
+				initGame();
+			}
 			return;
 		}
 		
@@ -395,7 +417,6 @@ $(window).ready(function(){
 				gameState = isEndOfGame(pieceList, turn);
 				if (gameState["winner"] != "none"){
 					// Game is over
-					console.log("here");
 					drawEndScreen(gameState);
 					return;					
 				}
