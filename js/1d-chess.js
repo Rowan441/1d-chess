@@ -1,7 +1,6 @@
 // Global vars.
 let canvas, ctx, pieces;
-positionsSeen = {"knr otg" : 1};
-threefoldRep = false;
+let positionsSeen, threefoldRep;
 
 function getImagesfromDom() {
 
@@ -374,6 +373,8 @@ $(window).ready(function(){
 		selectedTile = -1;
 		legalMoves = [];
 		gameState = {"winner" : "none"};
+		positionsSeen = {"knr otg" : 1};
+		threefoldRep = false;
 		
 		//init board
 		pieceList = ["white-king", "white-knight", "white-rook", "Empty", "Empty", "black-rook", "black-knight", "black-king"];
