@@ -1,6 +1,5 @@
 // Global vars.
 let canvas, ctx, pieces;
-let positionsSeen, threefoldRep;
 
 function getImagesfromDom() {
 
@@ -218,13 +217,13 @@ function inCheck(pieceList, turn) {
 }
 
 // Checks for win conditions (i.e win, loss, draw)
-function isEndOfGame(pieceList, turn) {
+function isEndOfGame(pieceList, turn, threefoldRep) {
 	let kingInCheck = inCheck(pieceList, turn);
 	
 	let anyLegalMoves = false;
 	for (let i = 0; i < pieceList.length; i++) {
 		if (pieceList[i].includes(turn)) {
-			if (getLegalMoves(i, pieceList, turn) != 0) {
+			if (getLegalMoves(i, pieceList, turn).length != 0) {
 				anyLegalMoves = true;
 				break;
 			}
@@ -243,44 +242,43 @@ function isEndOfGame(pieceList, turn) {
 		return {
 			"winner" : "draw", 
 			"reason" : "insufficient material"
-		}
+		};
 	}
 	
 	if (threefoldRep){
 		return {
 			"winner" : "draw", 
 			"reason" : "3-fold repetition"
-		}
+		};
 	}
 	
 	if (anyLegalMoves) {
 		return {
 			"winner" : "none"
-		}
+		};
 	}
 	
 	if (kingInCheck && !anyLegalMoves) {
 		return {
 			"winner" : otherColor(turn), 
 			"reason" : "checkmate"
-		}
+		};
 	}
 	
 	if (!kingInCheck && !anyLegalMoves) {
 		return {
 			"winner" : "draw", 
 			"reason" : "stalemate"
-		}
+		};
 	}
 	
 	
 	
 }
 
-function drawEndScreen(gameState) {
+function drawEndScreen(gameResult) {
 	const backgroundColour = "rgba(0, 0, 0, 0.5)";
 	const textColor = "rgb(255, 255, 255)";
-	const buttonColor = "#5a5b5d";
 	
 	// draw: background
 	ctx.fillStyle = backgroundColour;
@@ -291,35 +289,26 @@ function drawEndScreen(gameState) {
 	ctx.textAlign = "center";
 	ctx.font = "40px Arial";
 	ctx.textBaseline = "middle";
-	let script;
-	switch (gameState["winner"]){
+	let message;
+	switch (gameResult["winner"]){
 		case "white":
-			script = "White wins";
+			message = "White wins";
 			break;
 		case "black":
-			script = "Black wins";
+			message = "Black wins";
 			break;
 		case "draw":
-			script = "Draw";
+			message = "Draw";
 			break;
 	}
-	script += " by " + gameState["reason"] + "!";
-	ctx.fillText(script, 400, 30);
-	
-	// draw: 'play again' button
-	
-	ctx.fillStyle = buttonColor;
-	roundRect(ctx, 325, 55, 150, 30, 5, true, false);
-	
-	ctx.fillStyle = textColor;
-	ctx.font = "25px sans-sarif";
-	ctx.fillText("Play again?", 400, 70);
+	message += " by " + gameResult["reason"] + "!";
+	ctx.fillText(message, 400, 50);
 	
 }
 
 // Keeps track of number of times every position has been seen
-function recordPosition(pieceList) {
-	
+function recordPosition(pieceList, positionsSeen, threefoldRep) {
+	//Hash the game state
 	let hash = '';
 	pieceList.forEach( function(piece) {
 		switch (piece) {
@@ -346,7 +335,6 @@ function recordPosition(pieceList) {
 				break;
 		}
 	});
-	
 	if (Object.keys(positionsSeen).includes(hash)) {
 		positionsSeen[hash] += 1
 		if (positionsSeen[hash] == 3) {
@@ -355,6 +343,7 @@ function recordPosition(pieceList) {
 	} else {
 		positionsSeen[hash] = 1;
 	}
+	return threefoldRep;
 }
 	
 
@@ -365,68 +354,99 @@ $(window).ready(function(){
 	ctx = canvas.get(0).getContext("2d");
 	pieces = getImagesfromDom();
 	
-	let turn, selectedTile, legalMoves, gameState, pieceList;
+	playAgainButton = $("#chess-replay");
+	claimDrawButton = $("#chess-draw");
+	
+	let selectedTile, legalMoves, gameState;
 	
 	initGame = function() {
+		//init gameState
+		gameState = {
+			"turn" : "white",
+			"gameResult" : {"winner" : "none"},
+			"positionsSeen" : {"knr otg" : 1},
+			"pieceList" : 
+			["white-king", "white-knight", "white-rook", "Empty", "Empty", "black-rook", "black-knight", "black-king"],
+			"threefoldRep" : false
+		}
+		
 		// init vars
-		turn = "white";
 		selectedTile = -1;
 		legalMoves = [];
-		gameState = {"winner" : "none"};
-		positionsSeen = {"knr otg" : 1};
-		threefoldRep = false;
 		
-		//init board
-		pieceList = ["white-king", "white-knight", "white-rook", "Empty", "Empty", "black-rook", "black-knight", "black-king"];
-		drawBoard(ctx, pieceList, selectedTile);
+		// draw starting board
+		drawBoard(ctx, gameState["pieceList"], selectedTile);
+		
+		claimDrawButton.addClass("invisible");
 	};
 	
 	initGame();
 
 	// 'mouesdown on board' event handler
 	$("#chess-canvas").mousedown(function(e) {
-		if (gameState["winner"] != "none"){
-			posClicked = getCursorPosition(e);
-			if (325 <= posClicked[0] && posClicked[0] <= 475 &&
-			    55 <= posClicked[1] && posClicked[1] <= 85) {
-					
-				//reset game
-				initGame();
-			}
+		
+		if (gameState["gameResult"]["winner"] != "none"){
+			//Don't allow any input if the game is over
 			return;
 		}
 		
 		let tileClicked = getTileFromClick(e);
 		
 		if (selectedTile == -1) { // No Selection:
-			if (pieceList[tileClicked].includes(turn)) {
+			if (gameState["pieceList"][tileClicked].includes(gameState["turn"])) {
 				selectedTile = tileClicked;
-				legalMoves = getLegalMoves(selectedTile, pieceList, turn);
-				drawBoard(ctx, pieceList, selectedTile, legalMoves);
+				legalMoves = getLegalMoves(selectedTile, gameState["pieceList"], gameState["turn"]);
+				drawBoard(ctx, gameState["pieceList"], selectedTile, legalMoves);
 			}
 		} else { // Piece Selected:
 			if (legalMoves.includes(tileClicked)) {
-				makeMove(selectedTile, tileClicked, pieceList);
-				recordPosition(pieceList);
-				
+				makeMove(selectedTile, tileClicked, gameState["pieceList"]);
+				gameState["threefoldRep"] = recordPosition(gameState["pieceList"], gameState["positionsSeen"], gameState["threefoldRep"]);
 				selectedTile = -1;
-				drawBoard(ctx, pieceList, selectedTile);	
+				drawBoard(ctx, gameState["pieceList"], selectedTile);	
+				
 				// END OF TURN
-				turn = otherColor(turn)
+				gameState["turn"] = otherColor(gameState["turn"])
 				
 				// Check for winner/loser/draw
-				gameState = isEndOfGame(pieceList, turn);
-				if (gameState["winner"] != "none"){
+				gameState["gameResult"] = isEndOfGame(gameState["pieceList"], gameState["turn"], gameState["threefoldRep"]);
+				if (gameState["gameResult"]["winner"] != "none"){
 					// Game is over
-					drawEndScreen(gameState);
+					drawEndScreen(gameState["gameResult"]);	
 					return;					
 				}
+				console.log("game not over");
+				//If the game is not over, check for claim draw-able position
+				let numPieces = 0;
+				for (let i = 0; i < gameState["pieceList"].length; i++) {
+					if (!gameState["pieceList"][i].includes("Empty")) {
+						numPieces++;
+					}
+				}
+				if (numPieces == 3){
+					claimDrawButton.removeClass("invisible");
+				}
+				console.log(numPieces);
 			} 
 			// unselect the piece
 			legalMoves = [];
 			selectedTile = -1;
-			drawBoard(ctx, pieceList, selectedTile, legalMoves);	
+			drawBoard(ctx, gameState["pieceList"], selectedTile, legalMoves);	
 		}
 	});	
+	
+	playAgainButton.click( function() {
+		//reset game
+		initGame();
+	});
+	
+	claimDrawButton.click( function() {
+		gameState["gameResult"] = {
+			"winner" : "draw", 
+			"reason" : "agreement"
+		};
+		drawEndScreen(gameState["gameResult"]);	
+	});
+	
 	
 });

@@ -7,6 +7,7 @@
 	<script src="./js/jquery-3.6.0.min.js"></script>
 	<script src="./js/roundRect.js"></script>
 	<script src="./js/1d-chess.js"></script>
+	<script src="./js/chess-ai.js"></script>
 </head>
 
 <div class="pieces-images" hidden>
@@ -23,8 +24,10 @@
 
 	<div id="chess-container">
 		<canvas id="chess-canvas" width="800" height="100"></canvas>
-		<button type="button" hidden="true"> Claim Draw </button>
-		<button type="button" hidden="true"> Try again </button>
+		<div id="buttons">
+			<button id="chess-draw" class="invisible" type="button" > Claim Draw </button>
+			<button id="chess-replay" type="button"> Restart Game</button>
+		<div id="buttons">
 	</div>
 	
 </body>
