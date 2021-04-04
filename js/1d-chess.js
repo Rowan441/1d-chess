@@ -346,6 +346,18 @@ function recordPosition(pieceList, positionsSeen, threefoldRep) {
 	return threefoldRep;
 }
 	
+function canClaimDraw(pieceList) {
+	let numPieces = 0;
+	for (let i = 0; i < pieceList.length; i++) {
+		if (!pieceList[i].includes("Empty")) {
+			numPieces++;
+		}
+	}
+	if (numPieces == 3){
+		return true;
+	}
+	return false;
+}
 
 $(window).ready(function(){
 
@@ -377,7 +389,7 @@ $(window).ready(function(){
 		// draw starting board
 		drawBoard(ctx, gameState["pieceList"], selectedTile);
 		
-		claimDrawButton.addClass("invisible");
+		//DEBUGclaimDrawButton.addClass("invisible");
 	};
 	
 	initGame();
@@ -415,18 +427,10 @@ $(window).ready(function(){
 					drawEndScreen(gameState["gameResult"]);	
 					return;					
 				}
-				console.log("game not over");
 				//If the game is not over, check for claim draw-able position
-				let numPieces = 0;
-				for (let i = 0; i < gameState["pieceList"].length; i++) {
-					if (!gameState["pieceList"][i].includes("Empty")) {
-						numPieces++;
-					}
-				}
-				if (numPieces == 3){
+				if (canClaimDraw(gameState["pieceList"])) {
 					claimDrawButton.removeClass("invisible");
 				}
-				console.log(numPieces);
 			} 
 			// unselect the piece
 			legalMoves = [];
@@ -441,11 +445,15 @@ $(window).ready(function(){
 	});
 	
 	claimDrawButton.click( function() {
+		getBestMove(gameState);
+		
+		/*
 		gameState["gameResult"] = {
 			"winner" : "draw", 
 			"reason" : "agreement"
 		};
 		drawEndScreen(gameState["gameResult"]);	
+		*/
 	});
 	
 	
