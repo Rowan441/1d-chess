@@ -415,6 +415,48 @@ function canClaimDraw(pieceList) {
 	return false;
 }
 
+function makeAIMove(gameState) {
+
+
+
+	let bestMove = getBestMove(gameState);
+	let startPos = bestMove[0];
+	let endPos = bestMove[1];
+
+	let capturingMove = false;
+	if (gameState["pieceList"][endPos] != "Empty"){
+		capturingMove = true;
+	}
+	makeMove(startPos, endPos, gameState["pieceList"]);
+	gameState["threefoldRep"] = recordPosition(gameState["pieceList"], gameState["positionsSeen"], gameState["threefoldRep"]);
+	drawBoard(ctx, gameState["pieceList"], startPos);	
+	if (capturingMove) {
+		if (sounds["chess-capture"]){ //Play sound
+			sounds["chess-capture"].play();
+		}
+	} else {
+		if (sounds["chess-move"]){ //Play sound
+			sounds["chess-move"].play();
+		}
+	}
+
+	// END OF TURN
+	gameState["turn"] = otherColor(gameState["turn"])
+				
+	// Check for winner/loser/draw
+	gameState["gameResult"] = isEndOfGame(gameState["pieceList"], gameState["turn"], gameState["threefoldRep"]);
+	if (gameState["gameResult"]["winner"] != "none"){
+		// Game is over
+		drawEndScreen(gameState["gameResult"]);	
+		return;					
+	}
+	//If the game is not over, check for claim draw-able position
+	if (canClaimDraw(gameState["pieceList"])) {
+		claimDrawButton.removeClass("invisible");
+	}
+
+}
+
 $(window).ready(function(){
 
 	// set global vars.
@@ -458,6 +500,11 @@ $(window).ready(function(){
 			//Don't allow any input if the game is over
 			return;
 		}
+
+		if (gameState["turn"] == "black"){
+			//Don't allow any input if it's not the player's turn
+			return;
+		}
 		
 		let tileClicked = getTileFromClick(e);
 		
@@ -470,8 +517,6 @@ $(window).ready(function(){
 		} else { // Piece Selected:
 			if (legalMoves.includes(tileClicked)) {
 				// Make move
-				console.log(sounds["chess-capture"].src);
-				console.log(sounds["chess-move"].src);
 				let capturingMove = false;
 				if (gameState["pieceList"][tileClicked] != "Empty"){
 					console.log("capmove");
@@ -502,10 +547,16 @@ $(window).ready(function(){
 					drawEndScreen(gameState["gameResult"]);	
 					return;					
 				}
+
+				setTimeout(function(){
+					makeAIMove(gameState);
+				}, 1000);
+
 				//If the game is not over, check for claim draw-able position
 				if (canClaimDraw(gameState["pieceList"])) {
 					claimDrawButton.removeClass("invisible");
 				}
+
 			} 
 			// unselect the piece
 			legalMoves = [];

@@ -47,9 +47,13 @@ function getBestMove(gameState) {
 	
 	gameState["noRooks"] = 0;
 	
+	gameState["bestMove"] = "None";
+
 	console.log("score: " + minimax(gameState))
 	console.log(gameState);
 	console.log(gameState.bestMove);
+
+	return gameState.bestMove
 }
 
 function minimax(gameState, a=-1, b=1, depth=0) {
@@ -70,8 +74,8 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 				return 0;
 		}
 	}
-	if (canClaimDraw(gameState["pieceList"])) {
-		// console.log("1 knights draw");
+	if (canClaimDraw(gameState["pieceList"]) && gameState["bestMove"] != "None") {
+		// console.log("1 knight draw");
 		return 0;
 	}
 	if (! anyRooks(gameState["pieceList"])) {
