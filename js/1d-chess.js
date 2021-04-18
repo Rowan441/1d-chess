@@ -32,6 +32,7 @@ function drawBoard(ctx, pieceList, tileSelected, legalMoves) {
 	const darkTileColor = "#b58863";
 	const lightTileColor = "#f0d9b5 ";
 	const highlightColor = "rgba(10, 255, 10, 0.15)";
+	const checkColor = "rgba(255, 0, 0, 0.4)";
 	const indicatorColor = "rgba(0, 0, 0, 0.25)";
 	const pieceScale = 220
 	
@@ -52,6 +53,20 @@ function drawBoard(ctx, pieceList, tileSelected, legalMoves) {
 	if (tileSelected != -1) {
 		ctx.fillStyle = highlightColor;
 		ctx.fillRect(tileSelected*100, 0, 100, 100);
+	}
+
+	// draw: king in check tiles
+	let kingPos = checkedKing(pieceList, "white");
+	console.log(kingPos);
+	if (kingPos != "none") {
+		ctx.fillStyle = checkColor;
+		ctx.fillRect(kingPos*100, 0, 100, 100);
+	}
+	kingPos = checkedKing(pieceList, "black");
+	console.log(kingPos);
+	if (kingPos != "none") {
+		ctx.fillStyle = checkColor;
+		ctx.fillRect(kingPos*100, 0, 100, 100);
 	}
 	
 	// draw: pieces
@@ -200,6 +215,32 @@ function otherColor(color) {
 	} else {
 		return "white";
 	}
+}
+
+// Returns the position of a king in check, fales if king is not in check
+function checkedKing(pieceList, turn) {
+
+	// find king
+	let kingPos;
+	for (let i = 0; i < pieceList.length; i++) {
+		if (pieceList[i] == (turn + "-king") ) {
+			kingPos = i;
+			break;
+		}
+	}
+	
+	for (let i = 0; i < pieceList.length; i++) {
+		if (pieceList[i].includes(otherColor(turn))) {
+			let possibleMoves = getPossbleMoves(i, pieceList, otherColor(turn));
+			if (possibleMoves.includes(kingPos)) {
+				return kingPos;
+			}
+		}
+	}
+	
+	
+	return "none";
+
 }
 
 // returns true is 'turn's king is in immediate danger
