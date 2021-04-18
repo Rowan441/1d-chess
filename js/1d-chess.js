@@ -448,12 +448,14 @@ function makeAIMove(gameState) {
 	if (gameState["gameResult"]["winner"] != "none"){
 		// Game is over
 		drawEndScreen(gameState["gameResult"]);	
-		return;					
+		return true;					
 	}
 	//If the game is not over, check for claim draw-able position
 	if (canClaimDraw(gameState["pieceList"])) {
 		claimDrawButton.removeClass("invisible");
 	}
+
+	return false;
 
 }
 
@@ -552,7 +554,7 @@ $(window).ready(function(){
 				}
 
 				setTimeout(function(){
-					makeAIMove(gameState);
+					gameEnded = makeAIMove(gameState);
 				}, 1000);
 
 				//If the game is not over, check for claim draw-able position
