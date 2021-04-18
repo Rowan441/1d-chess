@@ -6,9 +6,14 @@ function getSFXs() {
 
 	sounds = {}
 
-	var audioElement = new Audio('./assets/audio/chess-move.mp3');
+	let audioElement = new Audio('./assets/audio/chess-move.mp3');
 	audioElement.addEventListener("canplaythrough", function() { 
 		sounds["chess-move"] = audioElement;
+	}, true);
+
+	audioElement2 = new Audio('./assets/audio/chess-capture.mp3');
+	audioElement2.addEventListener("canplaythrough", function() { 
+		sounds["chess-capture"] = audioElement2;
 	}, true);
 
 }
@@ -418,11 +423,6 @@ $(window).ready(function(){
 	pieces = getImagesfromDom();
 	getSFXs();
 
-	if (sounds["chess-move"]){
-		sounds["chess-move"].play();
-	}
-	
-
 	playAgainButton = $("#chess-replay");
 	claimDrawButton = $("#chess-draw");
 	
@@ -470,13 +470,27 @@ $(window).ready(function(){
 		} else { // Piece Selected:
 			if (legalMoves.includes(tileClicked)) {
 				// Make move
+				console.log(sounds["chess-capture"].src);
+				console.log(sounds["chess-move"].src);
+				let capturingMove = false;
+				if (gameState["pieceList"][tileClicked] != "Empty"){
+					console.log("capmove");
+					capturingMove = true;
+				}
 				makeMove(selectedTile, tileClicked, gameState["pieceList"]);
 				gameState["threefoldRep"] = recordPosition(gameState["pieceList"], gameState["positionsSeen"], gameState["threefoldRep"]);
 				selectedTile = -1;
 				drawBoard(ctx, gameState["pieceList"], selectedTile);	
-				if (sounds["chess-move"]){ //Play sound
-					sounds["chess-move"].play();
+				if (capturingMove) {
+					if (sounds["chess-capture"]){ //Play sound
+						sounds["chess-capture"].play();
+					}
+				} else {
+					if (sounds["chess-move"]){ //Play sound
+						sounds["chess-move"].play();
+					}
 				}
+				
 				
 				// END OF TURN
 				gameState["turn"] = otherColor(gameState["turn"])
