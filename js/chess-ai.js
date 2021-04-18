@@ -110,9 +110,9 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 				});
 			}
 		}
-		console.log(checkingMoves);
+		// console.log(checkingMoves);
 		let allLegalMoves = checkingMoves.concat(captureMoves.concat(otherLegalMoves.concat(kingMoves)));
-		console.log(allLegalMoves + "\n");
+		// console.log(allLegalMoves + "\n");
 		//console.log("white's legal moves: " + JSON.parse(JSON.stringify(allLegalMoves)))
 		//console.log(allLegalMoves);
 		//console.log("\n\n" + JSON.parse(JSON.stringify(allLegalMoves)))
@@ -137,7 +137,11 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 			//console.log("3fold: " + JSON.parse(JSON.stringify(childGameState["threefoldRep"])));
 			//console.log(JSON.parse(JSON.stringify(childGameState["positionsSeen"])));
 			
-			let childValue = minimax(childGameState, a, b, depth+1)
+			let childValue = minimax(childGameState, a, b, depth+1);
+			if(childValue == 1) {
+				gameState["bestMove"] = movePair;
+				return childValue
+			}
 			value = Math.max(value, childValue);
 			if (value == childValue) {
 				gameState["bestMove"] = movePair;
@@ -177,8 +181,8 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 		}
 		let allLegalMoves = checkingMoves.concat(captureMoves.concat(otherLegalMoves.concat(kingMoves)));
 		
-		//console.log("black's legal moves: " + JSON.parse(JSON.stringify(allLegalMoves)))
-		////console.log("minimizing");
+		// console.log("black's legal moves: " + JSON.parse(JSON.stringify(allLegalMoves)))
+		// console.log("minimizing");
 		//console.log(tostr(gameState["pieceList"]) + " : " + gameState["turn"]);
 		
 		for (let i = 0; i < allLegalMoves.length; i++) {
@@ -195,8 +199,12 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 			//console.log(JSON.parse(JSON.stringify(childGameState["gameResult"])));
 			//console.log(JSON.parse(JSON.stringify(childGameState["threefoldRep"])));
 			//console.log(JSON.parse(JSON.stringify(childGameState["positionsSeen"])));
-			
-			let childValue = minimax(childGameState, a, b, depth+1)
+		
+			let childValue = minimax(childGameState, a, b, depth+1);
+			if(childValue == -1) {
+				gameState["bestMove"] = movePair;
+				return childValue
+			}
 			value = Math.min(value, childValue);
 			if (value == childValue) {
 				gameState["bestMove"] = movePair;
