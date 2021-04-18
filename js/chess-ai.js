@@ -43,7 +43,6 @@ function anyRooks(pieceList){
 function getBestMove(gameState) {
 	console.log("Finding bestmove");
 	
-	
 	//TODO: hardcode in some of the first moves
 	
 	gameState["noRooks"] = 0;

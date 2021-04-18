@@ -11,13 +11,17 @@
 </head>
 
 <div class="pieces-images" hidden>
-	<img id="white-king" src="./pieces/white-king.svg"/>
-	<img id="white-knight" src="./pieces/white-knight.svg"/>
-	<img id="white-rook" src="./pieces/white-rook.svg"/>
+	<img id="white-king" src="./assets/pieces/white-king.svg"/>
+	<img id="white-knight" src="./assets/pieces/white-knight.svg"/>
+	<img id="white-rook" src="./assets/pieces/white-rook.svg"/>
 	
-	<img id="black-king" src="./pieces/black-king.svg"/>
-	<img id="black-knight" src="./pieces/black-knight.svg"/>
-	<img id="black-rook" src="./pieces/black-rook.svg"/>
+	<img id="black-king" src="./assets/pieces/black-king.svg"/>
+	<img id="black-knight" src="./assets/pieces/black-knight.svg"/>
+	<img id="black-rook" src="./assets/pieces/black-rook.svg"/>
+</div>
+
+<div class="audio-sfx" hidden>
+	<audio id="chess-move" src="./assets/audio/chess-move.mp3"> </audio>
 </div>
 
 <body>
@@ -25,7 +29,7 @@
 	<div id="chess-container">
 		<canvas id="chess-canvas" width="800" height="100"></canvas>
 		<div id="buttons">
-			<button id="chess-draw" <!--class="invisible"--> type="button" > Claim Draw </button>
+			<button id="chess-draw" <!--class="invisible"-- type="button" > Claim Draw </button>
 			<button id="chess-replay" type="button"> Restart Game</button>
 		<div id="buttons">
 	</div>

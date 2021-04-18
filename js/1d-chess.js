@@ -1,5 +1,17 @@
 // Global vars.
-let canvas, ctx, pieces;
+let canvas, ctx, pieces, sounds;
+
+// Loads sounds then adds them to 'sounds' object
+function getSFXs() {
+
+	sounds = {}
+
+	var audioElement = new Audio('./assets/audio/chess-move.mp3');
+	audioElement.addEventListener("canplaythrough", function() { 
+		sounds["chess-move"] = audioElement;
+	}, true);
+
+}
 
 function getImagesfromDom() {
 
@@ -365,12 +377,18 @@ $(window).ready(function(){
 	canvas = $("#chess-canvas");
 	ctx = canvas.get(0).getContext("2d");
 	pieces = getImagesfromDom();
+	getSFXs();
+
+	if (sounds["chess-move"]){
+		sounds["chess-move"].play();
+	}
 	
+
 	playAgainButton = $("#chess-replay");
 	claimDrawButton = $("#chess-draw");
 	
 	let selectedTile, legalMoves, gameState;
-	
+
 	initGame = function() {
 		//init gameState
 		gameState = {
@@ -412,10 +430,14 @@ $(window).ready(function(){
 			}
 		} else { // Piece Selected:
 			if (legalMoves.includes(tileClicked)) {
+				// Make move
 				makeMove(selectedTile, tileClicked, gameState["pieceList"]);
 				gameState["threefoldRep"] = recordPosition(gameState["pieceList"], gameState["positionsSeen"], gameState["threefoldRep"]);
 				selectedTile = -1;
 				drawBoard(ctx, gameState["pieceList"], selectedTile);	
+				if (sounds["chess-move"]){ //Play sound
+					sounds["chess-move"].play();
+				}
 				
 				// END OF TURN
 				gameState["turn"] = otherColor(gameState["turn"])
