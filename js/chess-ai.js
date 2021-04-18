@@ -41,17 +41,13 @@ function anyRooks(pieceList){
 
 // Gets the best move for the given board position, given it's 'turn's turn
 function getBestMove(gameState) {
-	console.log("Finding bestmove");
 	
 	//TODO: hardcode in some of the first moves
 	
 	gameState["noRooks"] = 0;
-	
 	gameState["bestMove"] = "None";
 
-	console.log("score: " + minimax(gameState))
-	console.log(gameState);
-	console.log(gameState.bestMove);
+	minimax(gameState)
 
 	return gameState.bestMove
 }

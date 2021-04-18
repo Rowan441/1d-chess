@@ -9,7 +9,7 @@
 - [x] play again button
 - [ ] load images through js not hmtl
 - [x] create readme.md
-- [ ] add sounds
-- [ ] make moves for ai
+- [x] add sounds
+- [x] make moves for ai
 - [ ] animations?
 - [ ] ts rewrite?

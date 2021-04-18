@@ -469,6 +469,7 @@ $(window).ready(function(){
 	claimDrawButton = $("#chess-draw");
 	
 	let selectedTile, legalMoves, gameState;
+	let gameEnded = false;
 
 	initGame = function() {
 		//init gameState
@@ -487,8 +488,10 @@ $(window).ready(function(){
 		
 		// draw starting board
 		drawBoard(ctx, gameState["pieceList"], selectedTile);
+
+		gameEnded = false;
 		
-		//DEBUGclaimDrawButton.addClass("invisible");
+		claimDrawButton.addClass("invisible");
 	};
 	
 	initGame();
@@ -519,7 +522,6 @@ $(window).ready(function(){
 				// Make move
 				let capturingMove = false;
 				if (gameState["pieceList"][tileClicked] != "Empty"){
-					console.log("capmove");
 					capturingMove = true;
 				}
 				makeMove(selectedTile, tileClicked, gameState["pieceList"]);
@@ -545,6 +547,7 @@ $(window).ready(function(){
 				if (gameState["gameResult"]["winner"] != "none"){
 					// Game is over
 					drawEndScreen(gameState["gameResult"]);	
+					gameEnded = true;
 					return;					
 				}
 
@@ -571,15 +574,14 @@ $(window).ready(function(){
 	});
 	
 	claimDrawButton.click( function() {
-		getBestMove(gameState);
-		
-		/*
-		gameState["gameResult"] = {
-			"winner" : "draw", 
-			"reason" : "agreement"
-		};
-		drawEndScreen(gameState["gameResult"]);	
-		*/
+		if (! gameEnded) {
+			gameState["gameResult"] = {
+				"winner" : "draw", 
+				"reason" : "agreement"
+			};
+			drawEndScreen(gameState["gameResult"]);	
+			gameEnded = true;
+		}
 	});
 	
 	
