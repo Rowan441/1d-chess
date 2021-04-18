@@ -57,13 +57,11 @@ function drawBoard(ctx, pieceList, tileSelected, legalMoves) {
 
 	// draw: king in check tiles
 	let kingPos = checkedKing(pieceList, "white");
-	console.log(kingPos);
 	if (kingPos != "none") {
 		ctx.fillStyle = checkColor;
 		ctx.fillRect(kingPos*100, 0, 100, 100);
 	}
 	kingPos = checkedKing(pieceList, "black");
-	console.log(kingPos);
 	if (kingPos != "none") {
 		ctx.fillStyle = checkColor;
 		ctx.fillRect(kingPos*100, 0, 100, 100);

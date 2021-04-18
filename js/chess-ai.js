@@ -59,7 +59,6 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 	}
 	gameState["gameResult"] = isEndOfGame(gameState["pieceList"], gameState["turn"], gameState["threefoldRep"])
 	if (gameState["gameResult"]["winner"] != "none") {
-		//console.log("terminal node: " + gameState["gameResult"]["winner"] + " won by " + gameState["gameResult"]["reason"] + "at depth" + gameState["depth"]);
 		switch (gameState["gameResult"]["winner"]){
 			case "white":
 				//console.log("white win");
@@ -72,7 +71,7 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 		}
 	}
 	if (canClaimDraw(gameState["pieceList"])) {
-		console.log("1 knights draw");
+		// console.log("1 knights draw");
 		return 0;
 	}
 	if (! anyRooks(gameState["pieceList"])) {
@@ -82,7 +81,6 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 			return 0;
 		}
 	}
-	//console.log("Turn of: " + gameState.turn);
 	let value;
 	if (gameState["turn"] == "white") { // Maximizing player
 		value = -Infinity;
@@ -110,17 +108,8 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 				});
 			}
 		}
-		// console.log(checkingMoves);
 		let allLegalMoves = checkingMoves.concat(captureMoves.concat(otherLegalMoves.concat(kingMoves)));
-		// console.log(allLegalMoves + "\n");
-		//console.log("white's legal moves: " + JSON.parse(JSON.stringify(allLegalMoves)))
-		//console.log(allLegalMoves);
-		//console.log("\n\n" + JSON.parse(JSON.stringify(allLegalMoves)))
-		//console.log(JSON.parse(JSON.stringify(kingMoves)) + " : " +  JSON.parse(JSON.stringify(captureMoves)) + " : " + JSON.parse(JSON.stringify(otherLegalMoves)))
-		
-		////console.log("maximizing");
-		//console.log(tostr(gameState["pieceList"]) + " : " + gameState["turn"]);
-		////console.log(gameState["positionsSeen"])
+
 		
 		for (let i = 0; i < allLegalMoves.length; i++) {
 			let movePair = allLegalMoves[i];
@@ -130,12 +119,6 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 			childGameState["threefoldRep"] = recordPosition(childGameState["pieceList"], childGameState["positionsSeen"], childGameState["threefoldRep"]);
 			childGameState["turn"] = otherColor(childGameState["turn"]);
 			childGameState["depth"] = gameState["depth"] + 1;
-			
-			//console.log("next states turn: " + JSON.parse(JSON.stringify(childGameState["turn"])));
-			//console.log("next states board: " + JSON.parse(JSON.stringify(tostr(childGameState["pieceList"]))));
-			//console.log());
-			//console.log("3fold: " + JSON.parse(JSON.stringify(childGameState["threefoldRep"])));
-			//console.log(JSON.parse(JSON.stringify(childGameState["positionsSeen"])));
 			
 			let childValue = minimax(childGameState, a, b, depth+1);
 			if(childValue == 1) {
@@ -181,10 +164,6 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 		}
 		let allLegalMoves = checkingMoves.concat(captureMoves.concat(otherLegalMoves.concat(kingMoves)));
 		
-		// console.log("black's legal moves: " + JSON.parse(JSON.stringify(allLegalMoves)))
-		// console.log("minimizing");
-		//console.log(tostr(gameState["pieceList"]) + " : " + gameState["turn"]);
-		
 		for (let i = 0; i < allLegalMoves.length; i++) {
 			let movePair = allLegalMoves[i];
 			//create gameState for child position
@@ -192,13 +171,6 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 			makeMove(movePair[0], movePair[1], childGameState["pieceList"]);
 			childGameState["threefoldRep"] = recordPosition(childGameState["pieceList"], childGameState["positionsSeen"], childGameState["threefoldRep"]);
 			childGameState["turn"] = otherColor(childGameState["turn"]);
-			
-			//console.log("next states turn: " + JSON.parse(JSON.stringify(childGameState["turn"])));
-			//console.log("next states board: " + JSON.parse(JSON.stringify(tostr(childGameState["pieceList"]))));
-			//console.log("looking at: " + tostr(gameState["pieceList"]) + " --> " + tostr(childGameState["pieceList"]));
-			//console.log(JSON.parse(JSON.stringify(childGameState["gameResult"])));
-			//console.log(JSON.parse(JSON.stringify(childGameState["threefoldRep"])));
-			//console.log(JSON.parse(JSON.stringify(childGameState["positionsSeen"])));
 		
 			let childValue = minimax(childGameState, a, b, depth+1);
 			if(childValue == -1) {
