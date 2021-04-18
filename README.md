@@ -5,7 +5,11 @@
 ## TODO:
 
 - [ ] allow variable sized canvas
-- [ ] implement AI
-- [ ] play again button
+- [x] implement AI
+- [x] play again button
 - [ ] load images through js not hmtl
-- [ ] create readme.md
+- [x] create readme.md
+- [ ] add sounds
+- [ ] make moves for ai
+- [ ] animations?
+- [ ] ts rewrite?
