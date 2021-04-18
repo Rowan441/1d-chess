@@ -44,6 +44,8 @@ function getBestMove(gameState) {
 	console.log("Finding bestmove");
 	
 	
+	//TODO: hardcode in some of the first moves
+	
 	gameState["noRooks"] = 0;
 	
 	console.log("score: " + minimax(gameState))
@@ -71,7 +73,7 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 		}
 	}
 	if (canClaimDraw(gameState["pieceList"])) {
-		//console.log("1 knights draw");
+		console.log("1 knights draw");
 		return 0;
 	}
 	if (! anyRooks(gameState["pieceList"])) {
@@ -86,6 +88,7 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 	if (gameState["turn"] == "white") { // Maximizing player
 		value = -Infinity;
 		// Find all legal moves
+		let checkingMoves = [];
 		let kingMoves = [];
 		let captureMoves = [];
 		let otherLegalMoves = [];
@@ -93,8 +96,12 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 			if (gameState["pieceList"][i].includes(gameState["turn"])) {
 				
 				getLegalMoves(i, gameState["pieceList"], gameState["turn"]).forEach(function(endPos) {
-					//TODO: priorizitze checking moves
-					if (gameState["pieceList"][endPos] != "Empty") {
+					// Make move in pieceListAfterMove
+					let pieceListAfterMove = [...gameState["pieceList"]]
+					makeMove(i, endPos, pieceListAfterMove);
+					if (inCheck(pieceListAfterMove, otherColor(gameState["turn"]))){ // Check if this move puts the enemy king in check
+						checkingMoves.push([i, endPos])
+					}else if (gameState["pieceList"][endPos] != "Empty") {
 						captureMoves.push([i, endPos]);
 					} else if (gameState["pieceList"][i] == "white-king") {
 						kingMoves.push([i, endPos]);
@@ -104,7 +111,9 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 				});
 			}
 		}
-		let allLegalMoves = captureMoves.concat(otherLegalMoves.concat(kingMoves));
+		console.log(checkingMoves);
+		let allLegalMoves = checkingMoves.concat(captureMoves.concat(otherLegalMoves.concat(kingMoves)));
+		console.log(allLegalMoves + "\n");
 		//console.log("white's legal moves: " + JSON.parse(JSON.stringify(allLegalMoves)))
 		//console.log(allLegalMoves);
 		//console.log("\n\n" + JSON.parse(JSON.stringify(allLegalMoves)))
@@ -144,6 +153,7 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 	} else { // Minimizing player
 		value = Infinity;
 		// Find all legal moves
+		let checkingMoves = [];
 		let kingMoves = [];
 		let captureMoves = [];
 		let otherLegalMoves = [];
@@ -151,7 +161,12 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 			if (gameState["pieceList"][i].includes(gameState["turn"])) {
 				
 				getLegalMoves(i, gameState["pieceList"], gameState["turn"]).forEach(function(endPos) {
-					if (gameState["pieceList"][endPos] != "Empty") {
+					// Make move in pieceListAfterMove
+					let pieceListAfterMove = [...gameState["pieceList"]]
+					makeMove(i, endPos, pieceListAfterMove);
+					if (inCheck(pieceListAfterMove, otherColor(gameState["turn"]))){ // Check if this move puts the enemy king in check
+						checkingMoves.push([i, endPos])
+					} else if (gameState["pieceList"][endPos] != "Empty") {
 						captureMoves.push([i, endPos]);
 					} else if (gameState["pieceList"][i] == "white-king") {
 						kingMoves.push([i, endPos]);
@@ -161,7 +176,7 @@ function minimax(gameState, a=-1, b=1, depth=0) {
 				});
 			}
 		}
-		let allLegalMoves = captureMoves.concat(otherLegalMoves.concat(kingMoves));
+		let allLegalMoves = checkingMoves.concat(captureMoves.concat(otherLegalMoves.concat(kingMoves)));
 		
 		//console.log("black's legal moves: " + JSON.parse(JSON.stringify(allLegalMoves)))
 		////console.log("minimizing");

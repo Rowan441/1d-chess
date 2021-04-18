@@ -163,9 +163,9 @@ function getLegalMoves(startPos, pieceList, turn) {
 	// check if king now in check
 	possibleMoves.forEach(function(endPos) {	
 		// make the potential move in 'newPieceList'
-		newPieceList = [...pieceList];
-		// Check if king would be in check
+		newPieceList = [...pieceList]; //clone array
 		makeMove(startPos, endPos, newPieceList);
+		// Check if king would be in check
 		if (!inCheck(newPieceList, turn)) {
 			legalMoves.push(endPos)
 		}	
